@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Product Add</title>
+  <!--   meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS v5.2.1 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  <!-- FontAwesome 6.2.0 CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+
+<body>
+
+
+  <form method="post" action="./backend/server.php" id="product_form">
+    <header>
+      <!-- place navbar here -->
+      <nav class="nav justify-content-between">
+        <a class="h4 " href="../">Products</a>
+        <p class="h3 "> Product Add</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <button type="submit" name="submit" id="save-data" class="btn btn-success me-2 px-4">Save</button>
+          <button type="button" onclick="window.location='./index.php'" class="btn btn-danger me-2">Cancel</button>
+        </div>
+      </nav>
+    </header>
+    <main class="container">
+      <div id="errors" class="mt-2"></div>
+      <div class="my-3">
+        <table class=" col-10 col-md-7 ">
+          <tr>
+            <th>
+              SKU
+            </th>
+            <td>
+              <input type="text" class="form-control" name="sku" id="sku" placeholder="Enter product's unique SKU"
+                value=''>
+            </td>
+          </tr>
+          <tr>
+            <th>
+              Name
+            </th>
+            <td>
+              <input type="text" class="form-control" name="name" id="name" placeholder="Enter product's Name">
+            </td>
+          </tr>
+          <tr>
+            <th>
+              Price ($)
+            </th>
+            <td>
+              <input type="text" class="form-control" class="form-control" name="price" id="price"
+                oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0');"
+                placeholder="Enter product's Price in US Dollar">
+            </td>
+          </tr>
+          <tr>
+            <th>
+              Type
+            </th>
+            <td>
+              <select class="form-select" name="type" id="productType">
+                <option disabled>Type Switcher</option>
+                <option id="dvd" value="dvd" selected>DVD</option>
+                <option id="book" value="book">Book</option>
+                <option id="furniture" value="furniture">Furniture</option>
+              </select>
+            </td>
+          </tr>
+          <tr id="typeIs">
+            <th>
+              Size (MB)
+            </th>
+            <td>
+              <input type="text" class="form-control " name="attribute" id="size"
+                oninput="this.value = this.value.replace(/[^0-9.]/g, '');" placeholder="Enter product's Size in MB">
+            </td>
+          </tr>
+        </table>
+      </div>
+    </main>
+  </form>
+
+  <!-- set attributes based on type -->
+  <script>
+    let type = document.querySelector("#productType");
+    let save_data = document.querySelector("#save-data");
+    let typeIs = document.querySelector("#typeIs");
+
+    // there's no way to add the attribute without using the value of <select>
+    // use onchange or onselect events won't work with the <option>
+    type.onchange = function () {
+      whichType();
+    }
+    function whichType() {
+      switch (type.value) {
+        case 'dvd':
+          save_data.setAttribute('value', 'DvdClass');
+          typeIs.innerHTML = `<th>
+              Size (MB)
+            </th>
+            <td>
+              <input  
+              type="text" class="form-control" name="attribute" id="size" value=""
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '');" 
+              placeholder="Enter product's Size in MB"  >
+            </td>`;
+          break;
+        case 'furniture':
+          save_data.setAttribute('value', 'FurnitureClass');
+          typeIs.innerHTML = `<th>
+        Dimentions (H*W*L)
+            </th>
+            <td class="d-flex">
+              <input  
+              type="text" class="form-control" name="attribute[]" id="height" value=""
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '');" 
+              placeholder=" Height in CM"  >
+              <input 
+              type="text" class="form-control" name="attribute[]" id="width"  value=""
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '');" 
+              placeholder=" Width in CM"  >
+              <input  
+              type="text" class="form-control" name="attribute[]" id="length" value=""
+              oninput="this.value = this.value.replace(/[^0-9.]/g, '');" 
+              placeholder=" Length in CM"  >
+            </td>`;
+          break;
+        case 'book':
+          save_data.setAttribute('value', 'BookClass');
+          typeIs.innerHTML = `<th>
+        Weight (KG)
+            </th>
+            <td>
+              <input  
+              type="text" class="form-control" name="attribute"  id="weight"
+             oninput="this.value = this.value.replace(/[^0-9.]/g, '');" 
+              placeholder="Enter product's Weight in KG"  >
+            </td>`;
+          break;
+      }
+    };
+
+    //delete cookies after submiting()
+   function deleteCookies(){
+      document.cookie = "validation=; expires=Thu, 01 Jan 2020 00:00:00 UTC; path=/addproduct.html;";
+      document.cookie = "old=; expires=Thu, 01 Jan 2020 12:00:00 UTC; path=/addproduct.html;";
+    }
+  </script>
+  <!-- validation values from cookie` -->
+  <script>
+    // console.log(document.cookie);
+
+    window.addEventListener("load", function () {
+      whichType();
+      let sku = document.querySelector("#sku");
+      let name = document.querySelector("#name");
+      let price = document.querySelector("#price");
+      let size = document.querySelector("#size");
+      let weight = document.querySelector("#weight");
+      let height = document.querySelector("#height");
+      let width = document.querySelector("#width");
+      let length = document.querySelector("#length");
+
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+      function getOld(cookie) {
+        if (cookie) {
+          cookie = cookie.replaceAll('-', " ");
+          old = cookie.split('_');
+          return old;
+        }
+      }
+      let cookie = getCookie('old');
+      if (cookie) {
+        console.log(getOld(cookie));
+        // index 0 is for button Submit`
+        let data = getOld(cookie);
+        sku.value = getOld(cookie)[1];
+        name.value = getOld(cookie)[2];
+        price.value = getOld(cookie)[3];
+        // switch (getOld(cookie)[4]) {
+        //   case 'book':
+        //     whichType();
+        //     type.value = "book"
+        //     weight.value = getOld(cookie)[4] || '';
+        //     break;
+        //   case 'dvd':
+        //     whichType();
+
+        //     type.value = "dvd"
+        //     size.value = getOld(cookie)[4] || '';
+        //     break;
+        //   case 'furniture':
+        //     whichType();
+        //     type.value = "furniture"
+        //     break;
+        // }
+      }
+
+      if (document.cookie.indexOf('validation') != -1) {
+        let errors = document.querySelector("#errors");
+        errors.innerHTML = `
+          <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Ooops!</strong> Please, make sure that you didn't forget something,  <strong>${getCookie('validation')}</strong> 
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          `;
+      }
+
+    });
+    //delete cookies on refresh page
+    window.addEventListener("beforeunload", function () {
+      deleteCookies();
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
